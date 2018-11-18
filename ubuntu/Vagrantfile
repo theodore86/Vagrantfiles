@@ -1,0 +1,72 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  #Box settings -- Ubuntu 14.0.5 LTS
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.hostname = "theogeo"
+  config.vm.define  "experiment"
+
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
+
+  # Network settings
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+  # config.vm.network "private_network", ip: "192.168.33.10"
+  # config.vm.network "public_network"
+
+  # Folder settings
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  
+  config.vm.synced_folder "../../../Libraries", "/scripts",
+    owner: "vagrant",
+    group: "vagrant",
+    mount_options: ["dmode=554,fmode=554"]
+
+  #Provider settings
+  config.vm.provider "virtualbox" do |vb|
+    #vb.gui = true
+    vb.name = "test_env"
+    vb.cpus = 1
+    vb.memory = "1024"
+  end
+
+  # Provision settings
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  
+  # File provisioners
+  config.vm.provision "vimrc", type: "file", source: "~/.vimrc", destination: "~/"
+
+  # Shell provisioners
+
+  #Package installation
+  $shcmds = <<-SCRIPT
+  apt-get update
+  apt-get install -y python-pip
+  SCRIPT
+  config.vm.provision "apt", type: "shell", inline: $shcmds
+
+  #Python package installation
+  $pycmds = <<-SCRIPT
+  pip install --upgrade --user pip
+  pip install --user tox
+  SCRIPT
+  config.vm.provision "python", type: "shell", inline: $pycmds
+
+  #Tshark compilation -- using shared folder
+  config.vm.provision "tshark", type: "shell" do |s|
+    s.inline = "/bin/bash /scripts/Shell/wireshark/compile_tshark.sh $1"
+    s.privileged = "true"
+    s.args = ["-c /scripts/Shell/wireshark/wireshark-master-ba-2.4-tar.gz -t -o /opt"]
+  end
+
+end
