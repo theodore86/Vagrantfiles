@@ -6,12 +6,12 @@ Vagrant.configure("2") do |config|
   #Box settings -- Ubuntu 14.0.5 LTS
   config.vm.box = "ubuntu/trusty64"
   config.vm.hostname = "theogeo"
-  config.vm.define  "experiment"
+  config.vm.define  "devpy"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
-  # config.vm.box_check_update = false
+  config.vm.box_check_update = true
 
   # Network settings
   # config.vm.network "forwarded_port", guest: 80, host: 8080
@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   
-  config.vm.synced_folder "../../../Libraries", "/scripts",
+  config.vm.synced_folder "../../../../../Libraries", "/scripts",
     owner: "vagrant",
     group: "vagrant",
     mount_options: ["dmode=554,fmode=554"]
@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
   #Provider settings
   config.vm.provider "virtualbox" do |vb|
     #vb.gui = true
-    vb.name = "test_env"
+    vb.name = "pydev_env"
     vb.cpus = 1
     vb.memory = "1024"
   end
@@ -48,24 +48,35 @@ Vagrant.configure("2") do |config|
 
   # Shell provisioners
 
-  #Package installation
+  #Vagrant user env variables
+  $envvars = <<-SCRIPT
+  tee "$HOME/.bashrc" <<EOF
+export PATH="$HOME/.local/bin:$PATH"
+EOF
+  SCRIPT
+
+  config.vm.provision "env", type: "shell", privileged: false, inline: $envvars
+
+  #Ubuntu package installation
   $shcmds = <<-SCRIPT
   apt-get update
   apt-get install -y python-pip
   SCRIPT
+  
   config.vm.provision "apt", type: "shell", inline: $shcmds
 
-  #Python package installation
+  #Python dev env
   $pycmds = <<-SCRIPT
   pip install --upgrade --user pip
   pip install --user tox
   SCRIPT
-  config.vm.provision "python", type: "shell", inline: $pycmds
+
+  config.vm.provision "python", type: "shell", privileged: false, inline: $pycmds
 
   #Tshark compilation -- using shared folder
   config.vm.provision "tshark", type: "shell" do |s|
     s.inline = "/bin/bash /scripts/Shell/wireshark/compile_tshark.sh $1"
-    s.privileged = "true"
+    s.privileged = true
     s.args = ["-c /scripts/Shell/wireshark/wireshark-master-ba-2.4-tar.gz -t -o /opt"]
   end
 
