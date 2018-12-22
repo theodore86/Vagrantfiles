@@ -1,7 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   #Box settings -- Ubuntu 14.0.5 LTS
   
@@ -12,11 +14,7 @@ Vagrant.configure("2") do |config|
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
-  config.vm.box_check_update = true
-
-  # Network settings
-  # config.vm.network "private_network", ip: "192.168.33.10"
-  # config.vm.network "public_network"
+  config.vm.box_check_update = false
 
   # Folder settings
   
@@ -27,10 +25,12 @@ Vagrant.configure("2") do |config|
 
   #Provider settings
   config.vm.provider "virtualbox" do |vb|
-    #vb.gui = true
+    vb.gui = false
     vb.name = "pydev_env"
-    vb.cpus = 1
+    vb.cpus = 2
     vb.memory = "1024"
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
  
   # File provisioners
@@ -48,26 +48,27 @@ alias tshark='/opt/wireshark/bin/tshark'
 EOF
   SCRIPT
 
-  config.vm.provision "env", type: "shell", privileged: false, inline: $envvars
+  config.vm.provision "env", type: "shell", run: "always", privileged: false, inline: $envvars
 
   #Ubuntu package installation
   $shcmds = <<-SCRIPT
-  apt-get update
-  apt-get install -y python-pip
+    apt-get update
+    apt-get upgrade -y python
+    apt-get install -y python-pip
   SCRIPT
-  
-  config.vm.provision "apt", type: "shell", inline: $shcmds
+
+  config.vm.provision "apt", type: "shell", run: "always", inline: $shcmds
 
   #Python dev env
   $pycmds = <<-SCRIPT
-  pip install --upgrade --user pip
-  pip install --user tox
+    pip install --upgrade --user pip
+    pip install --user tox
   SCRIPT
 
-  config.vm.provision "python", type: "shell", privileged: false, inline: $pycmds
+  config.vm.provision "python", type: "shell", run: "always", privileged: false, inline: $pycmds
 
   #Tshark compilation -- using shared folder
-  config.vm.provision "tshark", type: "shell" do |s|
+  config.vm.provision "tshark", type: "shell", run: "never" do |s|
     s.inline = "/bin/bash /scripts/Shell/wireshark/compile_tshark.sh $1"
     s.privileged = true
     s.args = ["-c /scripts/Shell/wireshark/wireshark-master-ba-2.4-tar.gz -t -o /opt"]
