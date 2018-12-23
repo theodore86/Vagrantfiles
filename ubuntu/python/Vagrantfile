@@ -4,26 +4,17 @@
 VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-
-  #Box settings -- Ubuntu 14.0.5 LTS
-  
+ 
   config.vm.box = "ubuntu/trusty64"
   config.vm.hostname = "theogeo"
   config.vm.define  "devpy"
-
-  # Disable automatic box update checking. If you disable this, then
-  # boxes will only be checked for updates when the user runs
-  # `vagrant box outdated`. This is not recommended.
   config.vm.box_check_update = false
 
-  # Folder settings
-  
   config.vm.synced_folder "../../../../../Libraries", "/scripts",
     owner: "vagrant",
     group: "vagrant",
     mount_options: ["dmode=554,fmode=554"]
 
-  #Provider settings
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.name = "pydev_env"
@@ -33,22 +24,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
  
-  # File provisioners
-  config.vm.provision "vimrc", type: "file", source: "~/.vimrc", destination: "~/"
-
-  # Shell provisioners
-
-  #Vagrant user env variables
-  $envvars = <<-SCRIPT
-  tee "$HOME/.bashrc" <<EOF
-export PS1="\\[\\033[1;36m\\]\\u\\[\\033[1;31m\\]@\\[\\033[1;32m\\]\\h:\\[\\033[1;35m\\]\\w\\[\\033[1;31m\\]\\$\\[\\033[0m\\] "
-export PATH="$HOME/.local/bin:$PATH"
-export PYTHONDONTWRITEBYTECODE=1
-alias tshark='/opt/wireshark/bin/tshark'
-EOF
+  #Dev environment setup
+  $env = <<-SCRIPT
+    cp -f /vagrant/scripts/{aliases.sh,env.sh} /etc/profile.d/
   SCRIPT
+  config.vm.provision "env", type: "shell", run: "always", inline: $env
 
-  config.vm.provision "env", type: "shell", run: "always", privileged: false, inline: $envvars
+  #User configuration files
+  config.vm.provision "vimrc", type: "file", source: "~/.vimrc", destination: "~/"
 
   #Ubuntu package installation
   $shcmds = <<-SCRIPT
@@ -56,7 +39,6 @@ EOF
     apt-get upgrade -y python
     apt-get install -y python-pip
   SCRIPT
-
   config.vm.provision "apt", type: "shell", run: "always", inline: $shcmds
 
   #Python dev env
@@ -64,7 +46,6 @@ EOF
     pip install --upgrade --user pip
     pip install --user tox
   SCRIPT
-
   config.vm.provision "python", type: "shell", run: "always", privileged: false, inline: $pycmds
 
   #Tshark compilation -- using shared folder
