@@ -1,2 +1,7 @@
 # Vagrant
-Repository with Vagrant files per project
+
+Repository with Vagrant files per OS.
+
+## Supported OSes:
+* CentOS
+* Ubuntu
