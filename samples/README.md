@@ -1,6 +1,6 @@
-# Vagrant
+# Vagrantfiles
 
-Samples of Vagrant files per OS.
+Samples of Vagrant files per OS (obsolete).
 
 ## Supported OSes:
 * CentOS
