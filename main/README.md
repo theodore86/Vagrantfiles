@@ -114,4 +114,4 @@ main
 * ``.vagrantplugins``: Vagrant plugins
 
 ## In a Nuschell
-![Vagrant Workflow](/docs/static/vagrant.png "Vagrant Workflow")
+![Vagrant Workflow](docs/static/vagrant.png "Vagrant Workflow")
