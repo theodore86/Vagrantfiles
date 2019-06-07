@@ -1,0 +1,16 @@
+## VAGRANT
+.vagrant
+*.box
+
+## TOX
+*.tox
+
+## ARCHIVES
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip

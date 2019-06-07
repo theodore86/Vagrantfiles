@@ -1,0 +1,67 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'yaml'
+require_relative 'lib/vagrant-host'
+require_relative 'lib/vagrant-proxy'
+require_relative 'lib/vagrant-vb'
+
+
+PROJECT_PATH = File.dirname(File.expand_path(__FILE__))
+CONFIG = YAML.load_file(File.join(PROJECT_PATH, 'vagrant.yaml'))
+HOST = CONFIG[:host]
+DEFAULT = CONFIG[:defaults]
+PROXY = CONFIG[:proxy]
+HOSTSUPDATER = CONFIG[:hostsupdater]
+SSH = CONFIG[:ssh]
+VAGRANTFILE_API_VERSION = 2 # Vagrantfile API/syntax version.
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    #-- SSH Settings --#
+    config.ssh.forward_agent = SSH[:forward_agent]
+    config.ssh.forward_x11 = SSH[:forward_x11]
+
+    #-- HostUpdater Settings --#
+    config.hostsupdater.aliases = HOSTSUPDATER[:aliases]
+    config.hostsupdater.remove_on_suspend = HOSTSUPDATER[:remove_on_suspend]
+
+    #-- Host Settings --#
+    config.vm.define HOST[:name] do |node|
+
+        #-- Box Settings --#
+        node.vm.box = HOST[:box] ||= DEFAULT[:box]
+        node.vm.box_url = HOST[:box_url] ||= DEFAULT[:box_url]
+        node.vm.box_check_update = HOST[:update]
+        node.vm.hostname = HOST[:name]
+
+        #-- Provider Settings --#
+        node.vm.provider "virtualbox" do |vb|
+            vb.gui = HOST[:gui]
+            vb.name= HOST[:name]
+            VirtualBox.resources(vb, HOST)
+            VirtualBox.modify_vm(vb, HOST)
+            VirtualBox.guest_property(vb, HOST)
+        end
+
+        #-- Networking --#
+        Host.networking(node.vm, HOST)
+
+        #-- Shared Folders --#
+        Host.synced_folders(node.vm, HOST)
+
+        #-- Proxy Settings --#
+        if Vagrant.has_plugin?("vagrant-proxyconf")
+            Proxy.conf(config, PROXY)
+        end
+
+        #-- Shell Provisioners --#
+        Host.shell_provision(node.vm, HOST)
+
+        #-- File Provisioners --#
+        Host.file_provision(node.vm, HOST)
+    end
+
+    config.vm.post_up_message = "#{HOST[:name]} has been successfully deployed:)"
+end
