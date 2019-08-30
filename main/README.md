@@ -38,13 +38,15 @@ The following `mandatory` packages must be installed through Chocolatey:
 
 Open Windows Cmd as Administrator:
 
-```
+```console
 > choco install virtualbox vagrant cmder
+> shutdown /r (Reboot Windows PC)
 ```
 
 *In case of Windows 7 install the Powershell patch:*
 
-* [Powershell version 3 or later](https://stackoverflow.com/questions/1825585/determine-installed-powershell-version)
+* [Vagrant requires Powershell version 3 or later](https://stackoverflow.com/questions/1825585/determine-installed-powershell-version)
+* [Install the patch Windows6.1-KB2506143-x64.msu](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
 
 ## Vagrant Box
 
@@ -67,6 +69,8 @@ Based on Ubuntu `bionic/18.04` box from: [https://vagrantcloud.com/ubuntu/bionic
 - python-tk python3-tk
 - graphviz
 - dos2unix
+- lsyncd
+- docker
 
 ### Python Development Packages
 - pip
@@ -78,11 +82,14 @@ Based on Ubuntu `bionic/18.04` box from: [https://vagrantcloud.com/ubuntu/bionic
 - .bash_profile
 - .bash_aliases
 - ipython_config.py
+- .lsyncd.config.lua
 
 ## Installation
-```
+```console
 git clone git@github.com:theodore86/Vagrantfiles.git
 cd Vangrantfiles/main
+export HTTPS_PROXY=ip_address:8080 (Linux host)
+set HTTPS_PROXY=ip_address:8080 (Windows host)
 vagrant up
 vagrant ssh
 ```
@@ -97,7 +104,7 @@ main
 ├── lib (d)
 ├── provisioners (d)
 ├── README.md
-├── templates (d)
+├── files (d)
 ├── tox.ini
 ├── vagrant.yaml
 ├── Vagrantfile
@@ -107,11 +114,11 @@ main
 * ``docs``: The documentation
 * ``lib``:  Vagrant helper modules
 * ``provisioners``: Vagrant provisioners
-* ``templates``: Templates for the user workspace
+* ``files``: Static files for the user workspace
 * ``tox.ini``: Test command line tool
 * ``vagrant.yaml``: Vagrant virtual machine central configuration file
 * ``Vagrantfile``: Vagrant project file
 * ``.vagrantplugins``: Vagrant plugins
 
 ## In a Nuschell
-![Vagrant Workflow](docs/static/vagrant.png "Vagrant Workflow")
+![Vagrant Workflow](docs/img/vagrant.png "Vagrant Workflow")

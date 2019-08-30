@@ -61,5 +61,5 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-alias tshark='/opt/wireshark/bin/tshark'
+alias tshark='/opt/wireshark_e2e/bin/tshark'
 EOF

@@ -1,0 +1,37 @@
+---
+
+site_name: E2E Vagrant Project
+site_author: E2E CMG test team
+site_description: E2E Vagrant project documentation
+repo_url: https://gitlab.lab.sk.alcatel-lucent.com/e2e/vagrant-e2e
+edit_uri: ""
+nav:
+    - Home: index.md
+    - User Guide:
+          - 'Vagrant':
+                - 'Overview': 'vagrant/overview.md'
+                - 'Commands': 'vagrant/commands.md'
+                - 'Vagrantfile': 'vagrant/vagrantfile.md'
+                - 'Providers': 'vagrant/providers.md'
+                - 'Networking': 'vagrant/network.md'
+                - 'System': 'vagrant/system.md'
+                - 'Provisioners': 'vagrant/provision.md'
+                - 'Synced Folders': 'vagrant/shared.md'
+                - 'Plugins': 'vagrant/plugins.md'
+                - 'Debugging': 'vagrant/debugging.md'
+          - 'Cmder': 'cmder/guide.md'
+          - 'Chocolatey': 'chocolatey/guide.md'
+    - Developer Guide:
+          - 'Ruby': 'dev/ruby.md'
+          - 'YAML': 'dev/yaml.md'
+          - 'Tox': 'dev/tox.md'
+          - 'Pre-commit': 'dev/hooks.md'
+theme:
+    name: readthedocs
+    highlightjs: true
+    hljs_languages:
+        - yaml
+copyright: Copyright (c) 2018, Nokia Solutions and Networks. All rights reserved.
+plugins:
+    - search
+...

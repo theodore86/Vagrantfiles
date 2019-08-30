@@ -11,8 +11,8 @@ module Host
     def synced_folders(vm, host)
         if host.key?(:synced_folders)
             folders = host[:synced_folders]
-        folders.each do |folder|
-            vm.synced_folder folder[:src], folder[:dest], folder[:options]
+            folders.each do |folder|
+                vm.synced_folder folder[:src], folder[:dest], folder[:options]
             end
         end
     end
@@ -73,6 +73,14 @@ module Host
                     options.each { |opts| vm.network data[:type], opts }
                 end
             end
+        end
+    end
+
+    def ssh(config, host)
+        if host.key?(:ssh)
+            settings = host[:ssh]
+            config.ssh.forward_agent = settings[:forward_agent]
+            config.ssh.forward_x11 = settings[:forward_x11]
         end
     end
 

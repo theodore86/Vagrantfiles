@@ -1,0 +1,54 @@
+----
+---- User configuration file for lsyncd.
+----
+---- Simple example for default rsync, but executing moves through on the target.
+----
+---- Currently this configuration is used to sync the WAF source code in Vagrant to MacMini PC's.
+----
+
+settings {
+    logfile = "/tmp/lsyncd.log",
+    statusFile = "/tmp/lsyncd.status",
+    statusInterval = 10,
+    nodaemon = true
+}
+
+
+---- Username for SSH, change it accordingly to your remote server settings.
+username = 'georgoma'
+
+---- Lsyncd to Multiple hosts, any new host should be added here.
+hosts = {
+    macmini1 = "10.84.73.4",
+    macmini2 = "10.84.73.5",
+    macmini3 = "10.84.255.21"
+}
+
+---- Lsyncd/Rsync to every host address
+for _, host in pairs(hosts)
+do
+    sync {
+        default.rsyncssh,
+        source = "/home/vagrant/waf/",
+        targetdir = "~/waf/",
+        host = host,
+        exclude = { '.tox/*', '.git/*', 'log/*', '*.swp'},
+        delay = 3,
+        rsync = {
+            archive = true,
+            compress = true,
+            protect_args = false,
+            owner = true,
+            group = true,
+            perms = true,
+            rsh = "/usr/bin/ssh -l " .. username .. " -o StrictHostKeyChecking=no"
+        },
+        ssh = {
+            options = {
+                ---- Replace the default SSH username if needed.
+                User = username,
+                StrictHostKeyChecking='no'
+            }
+        }
+    }
+end

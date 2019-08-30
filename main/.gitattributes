@@ -10,7 +10,9 @@
 *.config text
 *.conf text
 *.yaml text eof=lf
+*.yml text eof=lf
 *.tpl text
+*.tmpl text eof=lf
 .gitattributes text
 .gitignore text
 .yamllint text eof=lf

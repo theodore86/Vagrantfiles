@@ -213,7 +213,7 @@ done
 shift $((OPTIND-1))
 
 SOURCE_CODE_FP=$(readlink -f ${SOURCE_CODE})
-PREFIX="${OUTPUT_DIR}/wireshark"
+PREFIX="${OUTPUT_DIR}/wireshark_e2e"
 TSHARK_BIN="${PREFIX}/bin/tshark"
 
 case $ACTION in

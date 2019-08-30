@@ -3,31 +3,32 @@
 
 require 'yaml'
 require_relative 'lib/vagrant-host'
-require_relative 'lib/vagrant-proxy'
-require_relative 'lib/vagrant-vb'
+require_relative 'lib/plugins/vagrant-proxy'
+require_relative 'lib/plugins/vagrant-hostupdater'
+require_relative 'lib/providers/vagrant-vb'
 
 
 PROJECT_PATH = File.dirname(File.expand_path(__FILE__))
 CONFIG = YAML.load_file(File.join(PROJECT_PATH, 'vagrant.yaml'))
 HOST = CONFIG[:host]
-DEFAULT = CONFIG[:defaults]
-PROXY = CONFIG[:proxy]
 HOSTSUPDATER = CONFIG[:hostsupdater]
-SSH = CONFIG[:ssh]
+DEFAULT = CONFIG[:defaults]
 VAGRANTFILE_API_VERSION = 2 # Vagrantfile API/syntax version.
 
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-    #-- SSH Settings --#
-    config.ssh.forward_agent = SSH[:forward_agent]
-    config.ssh.forward_x11 = SSH[:forward_x11]
+    #-- Proxy Settings --#
+    if Vagrant.has_plugin?("vagrant-proxyconf")
+        Proxy.conf(config, HOST)
+    end
 
     #-- HostUpdater Settings --#
-    config.hostsupdater.aliases = HOSTSUPDATER[:aliases]
-    config.hostsupdater.remove_on_suspend = HOSTSUPDATER[:remove_on_suspend]
+    if Vagrant.has_plugin?("vagrant-hostupdater")
+        HostUpdater.conf(config, HOSTSUPDATER)
+    end
 
-    #-- Host Settings --#
+    #-- Guest Settings --#
     config.vm.define HOST[:name] do |node|
 
         #-- Box Settings --#
@@ -45,16 +46,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             VirtualBox.guest_property(vb, HOST)
         end
 
+        #-- SSH Settings --#
+        Host.ssh(config, HOST)
+
         #-- Networking --#
         Host.networking(node.vm, HOST)
 
         #-- Shared Folders --#
         Host.synced_folders(node.vm, HOST)
-
-        #-- Proxy Settings --#
-        if Vagrant.has_plugin?("vagrant-proxyconf")
-            Proxy.conf(config, PROXY)
-        end
 
         #-- Shell Provisioners --#
         Host.shell_provision(node.vm, HOST)
@@ -64,4 +63,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
     config.vm.post_up_message = "#{HOST[:name]} has been successfully deployed:)"
+
 end

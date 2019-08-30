@@ -25,4 +25,5 @@ apt-get install -y \
     python-tk python3-tk \
     graphviz \
     xauth \
-    dos2unix
+    dos2unix \
+    lsyncd

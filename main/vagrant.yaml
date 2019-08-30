@@ -3,35 +3,18 @@
 # Project directories
 :root:
     :provisioners: &provisioners 'provisioners'
-    :templates: &templates 'templates'
+    :files: &files 'files'
 
 # Default values
 :defaults:
     :box: 'ubuntu/bionic64'
     :box_url: 'https://vagrantcloud.com/ubuntu/bionic64'
 
-# Proxy properties
-# https://github.com/tmatilai/vagrant-proxyconf
-:proxy:
-    :http:
-        :address: &addr '127.0.0.1'
-        :port: &port 8080
-    :https:
-        :address: *addr
-        :port: *port
-    :enabled: false
-    :no_proxy: '127.0.0.1,localhost'
-
 # Hostupdater properties
 # https://github.com/cogitatio/vagrant-hostsupdater
 :hostsupdater:
     :aliases: ["testvm.local"]
     :remove_on_suspend: true
-
-# SSH properties
-:ssh:
-    :forward_agent: true
-    :forward_x11: true
 
 # VM properties
 :host:
@@ -45,7 +28,7 @@
     :customize:
         - :command: 'modifyvm'
           :settings:
-              # see https://github.com/mitchellh/vagrant/issues/1807
+              # https://github.com/mitchellh/vagrant/issues/1807
               - ['--natdnshostresolver1', 'on']
               - ['--natdnsproxy1', 'on']
               - ['--nictype1', 'virtio']
@@ -57,6 +40,31 @@
               - :set: ['/VirtualBox/GuestAdd/VBoxService/--timesync-set-on-restore', 1]
               - :set: ['/VirtualBox/GuestAdd/VBoxService/--timesync-set-start', 1]
               - :set: ['/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold', 1000]
+    :ssh:
+        :forward_agent: true
+        :forward_x11: true
+    # https://github.com/tmatilai/vagrant-proxyconf
+    :proxy:
+        :http:
+            :address: &addr '127.0.0.1'
+            :port: &port 8080
+        :https:
+            :address: *addr
+            :port: *port
+            :is_supported: false
+        :system:
+            :enabled: false
+            :no_proxy: '127.0.0.1,localhost'
+            :applications:
+                :apt:
+                    :enabled: false
+                    :skip: false
+                :git:
+                    :enabled: false
+                    :skip: false
+                :docker:
+                    :enabled: false
+                    :skip: false
     :networks:
         - :vpn:
               :type: 'forwarded_port'
@@ -140,37 +148,49 @@
                   :privileged: false
                   :binary: *true
                   :run: null
+            - :name: 'docker'
+              :options:
+                  :type: *shell
+                  :path: [*provisioners, *shell, 'install-docker.sh']
+                  :binary: *true
+                  :run: null
             - :name: 'ctshark'
               :options:
                   :type: *shell
                   :path: [*provisioners, *shell, 'compile-tshark.sh']
                   :binary: *true
-                  :args: ['-c', '/shared/wireshark.tar.gz', '-o', '/opt', '-t']
+                  :args: ['-c', '/shared/wireshark*', '-o', '/opt', '-t']
                   :run: 'never'
             - :name: 'dtshark'
               :options:
                   :type: *shell
                   :path: [*provisioners, *shell, 'compile-tshark.sh']
                   :binary: *true
-                  :args: ['-d', '/shared/wireshark.tar.gz', '-o', '/opt', '-t']
+                  :args: ['-d', '/shared/wireshark*', '-o', '/opt', '-t']
                   :run: 'never'
         :file:
             - :name: 'vimrc'
               :options:
                   :type: &file 'file'
-                  :source: [*templates, 'vimrc.tmpl']
+                  :source: [*files, 'vimrc.tmpl']
                   :destination: '.vimrc'
                   :run: 'always'
             - :name: 'gitconfig'
               :options:
                   :type: *file
-                  :source: [*templates, 'gitconfig.tmpl']
+                  :source: [*files, 'gitconfig.tmpl']
                   :destination: '.gitconfig'
                   :run: 'always'
             - :name: 'ipython'
               :options:
                   :type: *file
-                  :source: [*templates, 'ipython.tmpl']
+                  :source: [*files, 'ipython.tmpl']
                   :destination: '.ipython/profile_default/ipython_config.py'
+                  :run: 'always'
+            - :name: 'lsyncd'
+              :options:
+                  :type: *file
+                  :source: [*files, 'lsyncd.tmpl']
+                  :destination: '.lsyncd.conf.lua'
                   :run: 'always'
 ...
