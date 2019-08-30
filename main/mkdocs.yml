@@ -1,9 +1,9 @@
 ---
 
-site_name: E2E Vagrant Project
-site_author: E2E CMG test team
+site_name: Vagrant Project
+site_author: Theodore Georgomanolis <tgeorgomanolis@gmail.com>
 site_description: E2E Vagrant project documentation
-repo_url: https://gitlab.lab.sk.alcatel-lucent.com/e2e/vagrant-e2e
+repo_url: https://github.com/theodore86/Vagrantfiles.git
 edit_uri: ""
 nav:
     - Home: index.md
@@ -31,7 +31,6 @@ theme:
     highlightjs: true
     hljs_languages:
         - yaml
-copyright: Copyright (c) 2018, Nokia Solutions and Networks. All rights reserved.
 plugins:
     - search
 ...
