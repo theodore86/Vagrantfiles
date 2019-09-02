@@ -15,13 +15,11 @@ settings {
 
 
 ---- Username for SSH, change it accordingly to your remote server settings.
-username = 'georgoma'
+username = 'github'
 
 ---- Lsyncd to Multiple hosts, any new host should be added here.
 hosts = {
-    macmini1 = "10.84.73.4",
-    macmini2 = "10.84.73.5",
-    macmini3 = "10.84.255.21"
+    remote_host_1 = "1.1.1.1",
 }
 
 ---- Lsyncd/Rsync to every host address
@@ -29,8 +27,8 @@ for _, host in pairs(hosts)
 do
     sync {
         default.rsyncssh,
-        source = "/home/vagrant/waf/",
-        targetdir = "~/waf/",
+        source = "/home/vagrant/Vagrantfiles/",
+        targetdir = "~/Vagrantfiles/",
         host = host,
         exclude = { '.tox/*', '.git/*', 'log/*', '*.swp'},
         delay = 3,
