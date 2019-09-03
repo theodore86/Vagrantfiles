@@ -39,7 +39,8 @@ The following `mandatory` packages must be installed through Chocolatey:
 Open Windows Cmd as Administrator:
 
 ```console
-> choco install virtualbox vagrant cmder
+> cd path\to\VagrantFiles\main
+> choco install files\chocolatey.config
 > shutdown /r (Reboot Windows PC)
 ```
 
