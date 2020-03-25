@@ -1,0 +1,18 @@
+## Auto detect text files and perform LF normalization
+* text=auto
+
+## DOCUMENTS
+*.md text
+*.rst text
+LICENSE text
+
+## CONFIG
+.gitattributes text
+.gitignore text
+Vagrantfile text diff=ruby
+
+## RUBY
+*.rb text diff=ruby
+
+## SHELL
+*.sh text eof=lf
