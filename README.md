@@ -17,7 +17,7 @@ Samples of Vagrant files per OS (obsolete).
 ## Workflow
 
 ```console
-git clone [this-repo](https://github.com/theodore86/Vagrantfiles.git)
+git clone https://github.com/theodore86/Vagrantfiles.git
 cd Vagrantfiles/<distro>
 vagrant up
 ```
