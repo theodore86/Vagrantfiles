@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_check_update = false
 
   config.vm.provider "virtualbox" do |vb|
-     vb.gui = true
+     vb.gui = false
      vb.name= "centOS_sandbox"
      vb.cpus = 1
      vb.memory = "1024"
@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
       yum repolist enabled
       yum update -y
   SCRIPT
-  config.vm.provision "base_repos", type: "shell", run: "always" do |yum|
+  config.vm.provision "base_repos", type: "shell" do |yum|
       yum.inline = $base_repos
   end
 end
